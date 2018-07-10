@@ -1,0 +1,15 @@
+{
+  "name": "get-user-media-mock",
+  "version": "1.0.0",
+  "description": "Creates mock for getUserMedia so can use without Webcam.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    
+  },
+  "keywords": [],
+  "author": "Damien Golding",
+  "license": "MIT"
+}

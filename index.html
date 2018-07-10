@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <title>A mock library for getUserMedia and other stream device functions - DEMO</title>
+        <script src="./index.js"></script>
+        <script>
+            window.addEventListener('load', function(){
+                setup();
+                testGetUserMedia();
+            });
+
+            function setup(){
+                window.getUserMediaMock = new GetUserMediaMock();
+                getUserMediaMock.mock();
+            }
+
+            function testGetUserMedia(){
+                navigator.getUserMedia({video: true}, function(stream){
+                    const video = document.createElement('video');
+                    video.autoplay = true;
+                    video.srcObject = stream;
+
+                    document.getElementById('stream-wrapper').appendChild(video);
+                }, console.error);
+            }
+
+            function updateDevices(){
+                navigator.mediaDevices.enumerateDevices()
+                .then(function(devices){
+                    document.getElementById('devices').textContent = JSON.stringify(devices);
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <h1>A mock library for getUserMedia and other stream device functions - DEMO</h1>
+        <div>
+            This page should automatically mock getUserMedia.<br>
+            The stream will be placed in the area below.
+        </div>
+        <div id="stream-wrapper">
+            <!-- STREAM ADDDED HERE -->
+        </div>
+        <div>
+            <h2>Devices</h2>
+            <input type="button" value="Update Devices" onclick="updateDevices()">
+            <div id="devices">
+                <!-- DEVICES -->
+            </div>
+        </div>
+    </body>
+</html>
