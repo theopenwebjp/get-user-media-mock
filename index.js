@@ -54,14 +54,13 @@ class GetUserMediaMock{
 
     _storeOldHandles(){
         navigator._getUserMedia = navigator.getUserMedia
-        navigator._mediaDevices = {};
-        if(!navigator.mediaDevices){
+        if(!navigator.mediaDevices){//Fallback. May have some issues.
             navigator.mediaDevices = {};
         }
-        const m = navigator._mediaDevices;
-        m.enumerateDevices = navigator.mediaDevices.enumerateDevices;
-        m.getSupportedConstraints = navigator.mediaDevices.getSupportedConstraints;
-        m.getUserMedia = navigator.mediaDevices.getUserMedia;
+        const m = navigator.mediaDevices;
+        m._enumerateDevices = m.enumerateDevices;
+        m._getSupportedConstraints = m.getSupportedConstraints;
+        m._getUserMedia = m.getUserMedia;
 
         this.state.prepared = true;
     }
@@ -81,6 +80,55 @@ class GetUserMediaMock{
         for(let key in updates){
             c[type][key] = updates[key];
         }
+        return this;
+    }
+
+    /**
+     * Applies mock to enviroment ONLY IF getUserMedia constraints fail.
+     * @return this.
+     */
+    fallbackMock(){
+
+        if(!this.state.prepared){
+            this._storeOldHandles();
+        }
+        
+        const getSuccessHandle = (handle)=>{
+            return (stream)=>{
+                console.log('fallback NOT implemented');
+                handle(stream);
+            };
+        }
+
+        const handleFallback = (err, constraints)=>{
+            return this.getMockStreamFromConstraints(constraints)
+            .then((stream)=>{
+                console.warn('fallbackMock implemented', err);
+                return stream;
+            });
+        }
+
+        //navigator.getUserMedia
+        navigator.getUserMedia = (constraints, onSuccess, onError)=>{
+            navigator._getUserMedia(constraints, getSuccessHandle(onSuccess), (err)=>{
+                return handleFallback(err, constraints)
+                .then(onSuccess);
+            });
+        }
+        
+        //navigator.mediaDevices.getUserMedia
+        navigator.mediaDevices.getUserMedia = (constraints)=>{
+            return new Promise((resolve, reject)=>{
+                navigator.mediaDevices._getUserMedia(constraints)
+                .then(getSuccessHandle(resolve))
+                .catch((err)=>{
+                    return handleFallback(err, constraints)
+                    .then(resolve)
+                    .catch(reject);
+                });
+            });
+        }
+
         return this;
     }
 
@@ -150,11 +198,10 @@ class GetUserMediaMock{
             navigator.getUserMedia = navigator._getUserMedia;
             navigator._getUserMedia = null;
         }
-        if(navigator._mediaDevices){
-            navigator.mediaDevices.enumerateDevices = navigator._mediaDevices.enumerateDevices;
-            navigator.mediaDevices.getSupportedConstraints = navigator._mediaDevices.getSupportedConstraints;
-            navigator.mediaDevices.getUserMedia = navigator._mediaDevices.getUserMedia;
-            navigator._mediaDevices = null;
+        if(navigator.mediaDevices && navigator.mediaDevices._getUserMedia){
+            navigator.mediaDevices.enumerateDevices = navigator.mediaDevices._enumerateDevices;
+            navigator.mediaDevices.getSupportedConstraints = navigator.mediaDevices._getSupportedConstraints;
+            navigator.mediaDevices.getUserMedia = navigator.mediaDevices._getUserMedia;
         }
 
         this.state.prepared = false;

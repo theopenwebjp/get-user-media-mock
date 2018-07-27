@@ -9,11 +9,18 @@ The code below will automatically apply mocks to the following functions:
 * navigator.getUserMedia
 * navigator.mediaDevices.getUserMedia
 * navigator.mediaDevices.enumerateDevices
-* getSupportedConstraints
+* navigator.mediaDevices.getSupportedConstraints
 
 ```
 window.getUserMediaMock = new GetUserMediaMock();
 getUserMediaMock.mock();
+```
+
+The code below will only apply mock stream if getUserMedia function(navigator.getUserMedia OR navigator.mediaDevices.getUserMedia) results in an error.
+
+```
+window.getUserMediaMock = new GetUserMediaMock();
+getUserMediaMock.fallbackMock();
 ```
 
 For more advanced usage check [Functions].
