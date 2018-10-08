@@ -29,6 +29,32 @@
                     document.getElementById('devices').textContent = JSON.stringify(devices);
                 });
             }
+
+            function hiddenTests(){
+                const best1 = window.getUserMediaMock.getConstraintBestValue({
+                    video: {
+                        width: {
+                            ideal: 111,
+                            min: 11
+                        }
+                    },
+                    audio: true
+                }, 'video', 'width')
+
+                const best2 = window.getUserMediaMock.getConstraintBestValue({
+                    video: {
+                        width: {
+                            min: 11
+                        }
+                    },
+                    audio: true
+                }, 'video', 'width')
+
+                console.log({
+                    best1,
+                    best2
+                })
+            }
         </script>
     </head>
     <body>
