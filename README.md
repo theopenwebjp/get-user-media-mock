@@ -27,7 +27,24 @@ For more advanced usage check [Functions].
 
 ## Functions
 
-TO DO(Check code for now)
+* setMediaUrl (url)
+* setMockType (mockType)
+* fallbackMock ()
+* mock (options)
+* restoreOldHandles ()
+* getMockStreamFromConstraints
+* getMockCanvasStream (constraints)
+* getMockMediaElementStream (constraints)
+* createStartedRandomCanvasDrawerInterval (canvas)
+* getConstraintBestValue (constraints, type, key)
+* getMockDevices ()
+
+## Support
+
+Polyfills and transpiling(Babel, etc.) should be done outside of this library.
+
+* https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream
+* https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/captureStream
 
 ## Dependencies
 

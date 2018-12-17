@@ -294,7 +294,7 @@ class GetUserMediaMock {
   /**
      * Creates and starts an interval that paints randomly to a canvas.
      * @param {DOMCanvas} canvas
-     * @return {Number} interval that can be cleared with window.clearInterval
+     * @return {Object} meta data including interval that can be cleared with window.clearInterval
      */
   createStartedRandomCanvasDrawerInterval (canvas) {
     const FPS = 2
