@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <title>Video element getUserMedia mock - DEMO</title>
+        <script src="./index.js"></script>
+        <script>
+            window.addEventListener('load', function(){
+                setup();
+                testGetUserMedia();
+            });
+
+            function setup(){
+                window.getUserMediaMock = new GetUserMediaMock();
+                getUserMediaMock.setMediaUrl(getUserMediaMock.DEFAULT_MEDIA.VIDEO)
+                .setMockType('mediaElement')
+                .mock();
+            }
+
+            function testGetUserMedia(){
+                navigator.getUserMedia({video: true}, function(stream){
+                    const video = document.createElement('video');
+                    video.autoplay = true;
+                    video.srcObject = stream;
+
+                    document.getElementById('stream-wrapper').appendChild(video);
+                }, console.error);
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Video element getUserMedia mock - DEMO</h1>
+        <div>
+            This page automatically tries to load getUserMedia with a predefined video element as the source.
+            Make sure to use secure page(localhost, https).
+        </div>
+        <div id="stream-wrapper">
+            <!-- STREAM ADDDED HERE -->
+        </div>
+    </body>
+</html>
