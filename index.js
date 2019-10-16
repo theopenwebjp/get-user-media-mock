@@ -72,6 +72,7 @@ class GetUserMediaMock {
      * @param {String} type any key in this.settings.constraints
      * @param {Object} updates Data to apply to constraints
      * @param {Boolean} overwrite Whether to fully overwrite original.
+     * @return {boolean}
      */
   updateConstraints (type = 'video', updates = {}, overwrite = false) {
     const c = this.settings.constraints
@@ -90,7 +91,7 @@ class GetUserMediaMock {
   /**
    * Set media URL for mockType "mediaElement"
    * @param {String} url
-   * @return this
+   * @return {object} this
    */
   setMediaUrl (url) {
     this.settings.mediaUrl = url
@@ -100,7 +101,7 @@ class GetUserMediaMock {
   /**
    * Set a predefined mock type via string or a custom function.
    * @param {String|Function} mockType
-   * @return this
+   * @return {object} this
    */
   setMockType (mockType) {
     this.settings.mockType = mockType
@@ -109,7 +110,7 @@ class GetUserMediaMock {
 
   /**
    * Applies mock to environment ONLY IF getUserMedia constraints fail.
-   * @return this.
+   * @return {object} this.
    */
   fallbackMock () {
     if (!this.state.prepared) {
@@ -160,7 +161,7 @@ class GetUserMediaMock {
      * Applies mock to environment.
      * Generally should be applied before other scripts once.
      * @param {Object} options Way to only mock certain features. Mocks all by default.
-     * @return this
+     * @return {object} this
      */
   mock (options) {
     if (typeof options !== 'object') {
@@ -399,6 +400,11 @@ class GetUserMediaMock {
     })
   }
 
+  /**
+   * @param {MediaStream} stream
+   * @param {object} meta
+   * @return {function}
+   */
   _createStopCanvasStreamFunction (stream, meta) {
     return () => {
       window.clearInterval(meta.interval)
