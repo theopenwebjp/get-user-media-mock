@@ -27,16 +27,19 @@ For more advanced usage check [Functions].
 
 ## Functions
 
-* setMediaUrl (url)
-* setMockType (mockType)
+All functions below are on the main instance.
+Type information uses TypeScript format. Types can be searched in the repository.
+
+* setMediaUrl (url: string)
+* setMockType (mockType: MockType)
 * fallbackMock ()
-* mock (options)
+* mock (options: MockOptions)
 * restoreOldHandles ()
 * getMockStreamFromConstraints
-* getMockCanvasStream (constraints)
-* getMockMediaElementStream (constraints)
-* createStartedRandomCanvasDrawerInterval (canvas)
-* getConstraintBestValue (constraints, type, key)
+* getMockCanvasStream (constraints: MediaStreamConstraints)
+* getMockMediaElementStream (constraints: MediaStreamConstraints)
+* createStartedRandomCanvasDrawerInterval (canvas: HTMLCanvasElement)
+* getConstraintBestValue (constraints: MediaStreamConstraints, type: MediaStreamTrackType, key: keyof MediaTrackConstraints)
 * getMockDevices ()
 
 ## Support
@@ -48,6 +51,20 @@ Polyfills and transpiling(Babel, etc.) should be done outside of this library.
 
 ## Dependencies
 
-[https://github.com/meenie/band.js](band.js - MIT)
-[http://freemusicarchive.org/music/Tequila_Moonrise/Best_Of__Pick_Your_Player/Tequila_Moonrise_-_Best_Of_-_Pick_Your_Player_-_09_Tequila_Moonrise](Music - Public Domain)
-[https://videos.pexels.com/videos/video-of-people-walking-855564](Video - CC0 License)
+* [https://github.com/meenie/band.js](band.js - MIT)
+
+## Test
+
+```bash
+npx http-server ./
+# http://localhost:8080
+```
+
+## Test Media
+
+Test Media are included for testing AND possibly mocking.
+These media are not heavily depended on, so can be changed or removed if important.
+If using build tools, the sizes should not be an issue. If there is an issue when building please contact.
+
+* [http://freemusicarchive.org/music/Tequila_Moonrise/Best_Of__Pick_Your_Player/Tequila_Moonrise](Music - Public Domain Best_Of_-_Pick_Your_Player_-_09_Tequila_Moonrise)
+* [https://videos.pexels.com/videos/video-of-people-walking-855564](Video - CC0 License)

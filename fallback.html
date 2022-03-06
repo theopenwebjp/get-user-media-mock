@@ -1,101 +1,127 @@
 <html>
-    <head>
-        <title>Fallback mock setup for getUserMedia - DEMO</title>
-        <script src="./index.js"></script>
-        <script>
-            window.addEventListener('load', function(){
-                setup();
-            });
 
-            function setup(){
-                window.getUserMediaMock = new GetUserMediaMock();
-                window.getUserMediaMock.fallbackMock();
+<head>
+    <title>Fallback mock setup for getUserMedia - DEMO</title>
+    <script type="module">
+        import GetUserMediaMock from './index.js'
+
+        // Globals
+        window.video = video
+        window.audio = audio
+        window.videoAndAudio = videoAndAudio
+        window.invalid = invalid
+
+        window.addEventListener('load', onLoad);
+
+        function onLoad() {
+            setup();
+        }
+
+        function setup() {
+            window.getUserMediaMock = new GetUserMediaMock();
+            window.getUserMediaMock.fallbackMock();
+        }
+
+        function video() {
+            return _fallback({ video: true });
+        }
+
+        function audio() {
+            return _fallback({ audio: true });
+        }
+
+        function videoAndAudio() {
+            return _fallback({ video: true, audio: true });
+        }
+
+        function invalid() {
+            return _fallback('invalid');
+        }
+
+        /**
+         * @param {MediaStreamConstraints} constraints
+         **/
+        function _fallback(constraints) {
+
+            const methods = {
+                navigator: document.getElementById('method-navigator-getUserMedia').checked,
+                mediaDevices: document.getElementById('method-navigator-mediaDevices-getUserMedia').checked
+            };
+
+            if (methods.navigator) {
+                navigatorGetUserMedia(constraints);
+            } else {
+                mediaDevicesGetUserMedia(constraints);
             }
+        }
 
-            function video(){
-                return _fallback({video: true});
-            }
+        /**
+         * @param {MediaStreamConstraints} constraints
+         **/
+        function navigatorGetUserMedia(constraints) {
+            navigator.getUserMedia(constraints, _onStream, console.error);
+        }
 
-            function audio(){
-                return _fallback({audio: true});
-            }
-
-            function videoAndAudio(){
-                return _fallback({video: true, audio: true});
-            }
-
-            function invalid(){
-                return _fallback('invalid');
-            }
-
-            function _fallback(constraints){
-
-                const methods = {
-                    navigator: document.getElementById('method-navigator-getUserMedia').checked,
-                    mediaDevices: document.getElementById('method-navigator-mediaDevices-getUserMedia').checked
-                };
-
-                if(methods.navigator){
-                    navigatorGetUserMedia(constraints);
-                }else{
-                    mediaDevicesGetUserMedia(constraints);
-                }
-            }
-
-            function navigatorGetUserMedia(constraints){
-                navigator.getUserMedia(constraints, _onStream, console.error);
-            }
-
-            function mediaDevicesGetUserMedia(constraints){
-                navigator.mediaDevices.getUserMedia(constraints)
+        /**
+         * @param {MediaStreamConstraints} constraints
+         **/
+        function mediaDevicesGetUserMedia(constraints) {
+            navigator.mediaDevices.getUserMedia(constraints)
                 .then(_onStream)
                 .catch(console.error);
-            }
+        }
 
-            function _onStream(stream){
-                const video = document.createElement('video');
-                video.autoplay = true;
-                video.srcObject = stream;
+        /**
+         * @param {MediaStream} constraints
+         **/
+        function _onStream(stream) {
+            const video = document.createElement('video');
+            video.autoplay = true;
+            video.srcObject = stream;
 
-                document.getElementById('stream-wrapper').innerHTML = '';
-                document.getElementById('stream-wrapper').appendChild(video);
-            }
-        </script>
-        <style>
-            #controls{
-                margin: 10px;
-            }
+            document.getElementById('stream-wrapper').innerHTML = '';
+            document.getElementById('stream-wrapper').appendChild(video);
+        }
+    </script>
+    <style>
+        #controls {
+            margin: 10px;
+        }
 
-            #method{
-                margin: 5px;
-            }
+        #method {
+            margin: 5px;
+        }
 
-            input[type=button]{
-                margin: 5px;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Fallback mock setup for getUserMedia - DEMO</title></h1>
-        <div>
-            Click the buttons below to test using different constraints.<br>
-            If the constraints pass, a stream using your device will be displayed.<br>
-            If the constraints fail, a mock stream will be displayed.
+        input[type=button] {
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Fallback mock setup for getUserMedia - DEMO</title>
+    </h1>
+    <div>
+        Click the buttons below to test using different constraints.<br>
+        If the constraints pass, a stream using your device will be displayed.<br>
+        If the constraints fail, a mock stream will be displayed.
+    </div>
+    <div id="controls">
+        <div id="method">
+            Method:
+            <input type="radio" name="method" id="method-navigator-getUserMedia" checked> navigator.getUserMedia
+            <input type="radio" name="method" id="method-navigator-mediaDevices-getUserMedia">
+            navigator.mediaDevices.getUserMedia
         </div>
-        <div id="controls">
-            <div id="method">
-                Method: 
-                <input type="radio" name="method" id="method-navigator-getUserMedia" checked> navigator.getUserMedia
-                <input type="radio" name="method" id="method-navigator-mediaDevices-getUserMedia"> navigator.mediaDevices.getUserMedia
-            </div>
-            
-            <input type="button" value="Test for video" onclick="video()"><br>
-            <input type="button" value="Test for audio" onclick="audio()"><br>
-            <input type="button" value="Test for both video and audio" onclick="videoAndAudio()"><br>
-            <input type="button" value="Test for invalid constraints" onclick="invalid()"><br>
-        </div>
-        <div id="stream-wrapper">
-            <!-- STREAM ADDDED HERE -->
-        </div>
-    </body>
+
+        <input type="button" value="Test for video" onclick="video()"><br>
+        <input type="button" value="Test for audio" onclick="audio()"><br>
+        <input type="button" value="Test for both video and audio" onclick="videoAndAudio()"><br>
+        <input type="button" value="Test for invalid constraints" onclick="invalid()"><br>
+    </div>
+    <div id="stream-wrapper">
+        <!-- STREAM ADDDED HERE -->
+    </div>
+</body>
+
 </html>

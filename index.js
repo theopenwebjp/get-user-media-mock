@@ -1,4 +1,25 @@
 /**
+ * @typedef {'canvas'|'mediaElement'|(constraints: MediaStreamConstraints) => MediaStream} MockType
+ */
+
+/**
+ * @typedef {'audio'|'video'|'image'} MediaStreamTrackType
+ */
+
+/**
+ * @typedef {typeof MockOptions} MockOptions
+ */
+
+const MockOptions = () => ({
+  getUserMedia: true,
+  mediaDevices: {
+    getUserMedia: true,
+    getSupportedConstraints: true,
+    enumerateDevices: true
+  }
+})
+
+/**
  * Class for creating mock of getUserMedia for navigator.getUserMedia and navigator.mediaDevice.getUserMedia.
  * Usage: const m = new GetUserMediaMock(); m.setup();
  */
@@ -10,8 +31,11 @@ class GetUserMediaMock {
     }
     this.settings = {
       mediaUrl: this.DEFAULT_MEDIA.VIDEO,
+      /**
+       * @type {MockType}
+       */
       mockType: 'canvas', // "canvas", "mediaElement", function
-      constraints: {// Used for supported constraints
+      constraints: { // Used for supported constraints
         video: {
           aspectRatio: false, // Upon testing in Chrome, width and height hold priority over aspectRatio.
           facingMode: false,
@@ -69,10 +93,9 @@ class GetUserMediaMock {
 
   /**
      * Dynamically update constraints. Applied on next call of getUserMedia, etc.
-     * @param {String} type any key in this.settings.constraints
-     * @param {Object} updates Data to apply to constraints
-     * @param {Boolean} overwrite Whether to fully overwrite original.
-     * @return {boolean}
+     * @param {string} type any key in this.settings.constraints
+     * @param {Partial<MediaStreamConstraints>} updates Data to apply to constraints
+     * @param {boolean} overwrite Whether to fully overwrite original.
      */
   updateConstraints (type = 'video', updates = {}, overwrite = false) {
     const c = this.settings.constraints
@@ -90,8 +113,7 @@ class GetUserMediaMock {
 
   /**
    * Set media URL for mockType "mediaElement"
-   * @param {String} url
-   * @return {object} this
+   * @param {string} url
    */
   setMediaUrl (url) {
     this.settings.mediaUrl = url
@@ -100,8 +122,7 @@ class GetUserMediaMock {
 
   /**
    * Set a predefined mock type via string or a custom function.
-   * @param {String|Function} mockType
-   * @return {object} this
+   * @param {MockType} mockType
    */
   setMockType (mockType) {
     this.settings.mockType = mockType
@@ -110,20 +131,29 @@ class GetUserMediaMock {
 
   /**
    * Applies mock to environment ONLY IF getUserMedia constraints fail.
-   * @return {object} this.
    */
   fallbackMock () {
     if (!this.state.prepared) {
       this._storeOldHandles()
     }
 
+    /**
+     * @param {(stream: MediaStream) => void} handle
+     */
     const getSuccessHandle = (handle) => {
+      /**
+       * @param {MediaStream} stream
+       */
       return (stream) => {
         this._log('log', 'fallback NOT implemented')
         handle(stream)
       }
     }
 
+    /**
+     * @param {Error} err 
+     * @param {MediaStreamConstraints} constraints
+     */
     const handleFallback = (err, constraints) => {
       return this.getMockStreamFromConstraints(constraints)
         .then((stream) => {
@@ -132,7 +162,12 @@ class GetUserMediaMock {
         })
     }
 
-    // navigator.getUserMedia
+    /**
+     * navigator.getUserMedia
+     * @param {MediaStreamConstraints} constraints 
+     * @param {(stream: MediaStream) => void} onSuccess 
+     * @param {(err: Error) => void|any} onError 
+     */
     navigator.getUserMedia = (constraints, onSuccess, onError) => {
       navigator._getUserMedia(constraints, getSuccessHandle(onSuccess), (err) => {
         return handleFallback(err, constraints)
@@ -141,7 +176,10 @@ class GetUserMediaMock {
       })
     }
 
-    // navigator.mediaDevices.getUserMedia
+    /**
+     * navigator.mediaDevices.getUserMedia
+     * @param {MediaStreamConstraints} constraints
+     */
     navigator.mediaDevices.getUserMedia = (constraints) => {
       return new Promise((resolve, reject) => {
         navigator.mediaDevices._getUserMedia(constraints)
@@ -158,21 +196,13 @@ class GetUserMediaMock {
   }
 
   /**
-     * Applies mock to environment.
-     * Generally should be applied before other scripts once.
-     * @param {Object} options Way to only mock certain features. Mocks all by default.
-     * @return {object} this
-     */
+   * Applies mock to environment.
+   * Generally should be applied before other scripts once.
+   * @param {MockOptions} options Way to only mock certain features. Mocks all by default.
+   */
   mock (options) {
     if (typeof options !== 'object') {
-      options = {
-        getUserMedia: true,
-        mediaDevices: {
-          getUserMedia: true,
-          getSupportedConstraints: true,
-          enumerateDevices: true
-        }
-      }
+      options = MockOptions()
     }
 
     if (!this.state.prepared) {
@@ -237,8 +267,7 @@ class GetUserMediaMock {
      * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream
      * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/captureStream
      * @see https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createMediaStreamDestination
-     * @param {Object} constraints
-     * @return {Promise}
+     * @param {MediaStreamConstraints} constraints
      */
   getMockStreamFromConstraints (constraints) {
     let stream = null
@@ -259,7 +288,7 @@ class GetUserMediaMock {
   /**
      * Returns stream that is internally generated using canvas and random data.
      * ONCE STREAM IS NO LONGER NEEDED, SHOULD CALL .stop FUNCTION TO STOP DRAW INTERVAL.
-     * @param {MediaTrackContraints} constraints
+     * @param {MediaStreamConstraints} constraints
      * @return {MediaStream}
      */
   getMockCanvasStream (constraints) {
@@ -275,7 +304,7 @@ class GetUserMediaMock {
 
   /**
      * Returns stream with media used as source.
-     * @param {MediaTrackContraints} constraints
+     * @param {MediaStreamConstraints} constraints
      * @return {MediaStream}
      */
   getMockMediaElementStream (constraints) {
@@ -294,8 +323,8 @@ class GetUserMediaMock {
 
   /**
      * Creates and starts an interval that paints randomly to a canvas.
-     * @param {DOMCanvas} canvas
-     * @return {Object} meta data including interval that can be cleared with window.clearInterval
+     * @param {HTMLCanvasElement} canvas
+     * @returns meta data including interval that can be cleared with window.clearInterval
      */
   createStartedRandomCanvasDrawerInterval (canvas) {
     const FPS = 2
@@ -336,10 +365,9 @@ class GetUserMediaMock {
      * Returns appropriate defaults where important.
      * THIS IS FOR VALUES NOT ACTUAL SET CONTRAINTS.
      * USED FOR settings, etc. in UI.
-     * @param {MediaTrackConstraints} constraints
-     * @param {String} type
-     * @param {String} key
-     * @return {*}
+     * @param {MediaStreamConstraints} constraints
+     * @param {MediaStreamTrackType} type
+     * @param {keyof MediaStreamTrack} key
      */
   getConstraintBestValue (constraints, type, key) {
     const subConstraints = (typeof constraints[type] === 'object') ? constraints[type] : {}
@@ -374,22 +402,22 @@ class GetUserMediaMock {
   }
 
   /**
-     * Returns a set of mock devices using similar format.
-     * @return {Promise} resolves array
-     */
+   * Returns a set of mock devices using similar format.
+   */
   getMockDevices () {
-    const devices = [{
-      kind: 'audioinput',
-      label: '(4- BUFFALO BSW32KM03 USB PC Camera)'
-    },
-    {
-      kind: 'audiooutput',
-      label: 'Bluetooth Hands-free Audio'
-    },
-    {
-      kind: 'videooutput',
-      label: 'BUFFALO BSW32KM03 USB PC Camera'
-    }
+    const devices = [
+      {
+        kind: 'audioinput',
+        label: '(4- BUFFALO BSW32KM03 USB PC Camera)'
+      },
+      {
+        kind: 'audiooutput',
+        label: 'Bluetooth Hands-free Audio'
+      },
+      {
+        kind: 'videooutput',
+        label: 'BUFFALO BSW32KM03 USB PC Camera'
+      }
     ]
     return new Promise((resolve) => {
       devices.forEach((device, index) => {
@@ -402,8 +430,8 @@ class GetUserMediaMock {
 
   /**
    * @param {MediaStream} stream
-   * @param {object} meta
-   * @return {function}
+   * @param {{ interval: number }} meta
+   * @return {() => void)}
    */
   _createStopCanvasStreamFunction (stream, meta) {
     return () => {
@@ -425,9 +453,12 @@ class GetUserMediaMock {
   }
 }
 
+/*
 if (typeof window === 'object') {
   window.GetUserMediaMock = GetUserMediaMock
 }
 if (typeof module === 'object') {
   module.exports = GetUserMediaMock
 }
+*/
+export default GetUserMediaMock

@@ -1,8 +1,9 @@
 <html>
     <head>
         <title>Video element getUserMedia mock - DEMO</title>
-        <script src="./index.js"></script>
-        <script>
+        <script type="module">
+            import GetUserMediaMock from './index.js'
+
             window.addEventListener('load', function(){
                 setup();
                 testGetUserMedia();
@@ -16,13 +17,15 @@
             }
 
             function testGetUserMedia(){
-                navigator.getUserMedia({video: true}, function(stream){
+                // navigator.getUserMedia({video: true}, function(stream){ // Not used anymore.
+                navigator.getUserMedia({video: true})
+                .then(function(stream){
                     const video = document.createElement('video');
                     video.autoplay = true;
                     video.srcObject = stream;
 
                     document.getElementById('stream-wrapper').appendChild(video);
-                }, console.error);
+                }).catch(console.error);
             }
         </script>
     </head>
