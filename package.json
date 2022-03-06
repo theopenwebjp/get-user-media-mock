@@ -1,15 +1,35 @@
 {
-  "name": "get-user-media-mock",
+  "name": "@theopenweb/get-user-media-mock",
   "version": "1.0.0",
   "description": "Creates mock for getUserMedia so can use without Webcam.",
   "main": "index.js",
   "directories": {
     "lib": "lib"
   },
-  "scripts": {
-    
+  "scripts": {},
+  "keywords": [
+    "getUserMedia",
+    "navigator",
+    "mediaDevices",
+    "MediaStreamConstraints",
+    "MediaTrackConstraints",
+    "mock",
+    "video",
+    "audio",
+    "devices"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theopenwebjp/get-user-media-mock.git"
   },
-  "keywords": [],
-  "author": "Damien Golding",
+  "author": "The Open Web <noreply@theopenweb.jp> (https://theopenweb.jp)",
+  "contributors": [
+    "Damien Golding <noreply@damiengolding.com> (https://damiengolding.com)"
+  ],
+  "homepage": "https://theopenweb.info",
+  "bugs": {
+    "url": "https://github.com/theopenwebjp/get-user-media-mock/issues"
+  },
+  "private": false,
   "license": "MIT"
 }

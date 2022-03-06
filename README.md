@@ -2,6 +2,10 @@
 
 Mock library for getUserMedia and related functions.
 
+## Installation
+
+`npm install @theopenweb/get-user-media-mock`
+
 ## Usage
 
 The code below will automatically apply mocks to the following functions:
